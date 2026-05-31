@@ -4,12 +4,11 @@ function calculateSimpleRevenue(purchase, _product) {
     return sale_price * quantity * discountFactor;
 }
 
-function calculateBonusByProfit(index, total, seller) {
-    const { profit } = seller;
-    if (index === 0) return 0.15;
-    if (index === 1 || index === 2) return 0.10;
-    if (index === total - 1) return 0;
-    return profit * 0.05;
+function calculateBonusByProfit(index, total) {
+    if (index === 0) return 0.15;           // 1-е место — 15%
+    if (index === 1 || index === 2) return 0.10; // 2-е и 3-е места — 10%
+    if (index === total - 1) return 0;       // Последнее место — 0%
+    return 0.05;                             // Остальные — 5%
 }
 
 function analyzeSalesData(data, options) {
@@ -107,23 +106,21 @@ function analyzeSalesData(data, options) {
     const sortedSellers = [...sellerStats].sort((a, b) => b.profit - a.profit);
 
     /**
-     * Функция для расчёта бонусов на основе позиции в рейтинге
+     * Функция для расчёта коэффициента бонуса на основе позиции в рейтинге
      * @param {number} index - порядковый номер в отсортированном массиве (0 — первое место)
      * @param {number} total - общее число продавцов
-     * @param {Object} seller - карточка продавца
      * @returns {number} - коэффициент бонуса (0.15, 0.10, 0.05 или 0)
      */
-    function calculateBonusByProfit(index, total, seller) {
-        const { profit } = seller;
+    function calculateBonusByProfit(index, total) {
         if (index === 0) return 0.15;           // 1-е место — 15%
         if (index === 1 || index === 2) return 0.10; // 2-е и 3-е места — 10%
         if (index === total - 1) return 0;       // Последнее место — 0%
-        return profit * 0.05;                             // Остальные — 5%
+        return 0.05;                             // Остальные — 5%
     }
 
     // Рассчитываем бонусы и формируем топ-10 товаров для каждого продавца
     sortedSellers.forEach((seller, index) => {
-        seller.bonusRate = calculateBonusByProfit(index, sortedSellers.length, seller);
+        seller.bonusRate = calculateBonusByProfit(index, sortedSellers.length);
         seller.bonusAmount = seller.profit * seller.bonusRate;
 
         seller.top_products = Object.entries(seller.products_sold)
