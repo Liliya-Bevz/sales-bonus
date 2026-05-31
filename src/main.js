@@ -5,10 +5,11 @@ function calculateSimpleRevenue(purchase, _product) {
 }
 
 function calculateBonusByProfit(index, total, seller) {
+    const { profit } = seller;
     if (index === 0) return 0.15;
     if (index === 1 || index === 2) return 0.10;
     if (index === total - 1) return 0;
-    return 0.05;
+    return profit * 0.05;
 }
 
 function analyzeSalesData(data, options) {
@@ -113,10 +114,11 @@ function analyzeSalesData(data, options) {
      * @returns {number} - коэффициент бонуса (0.15, 0.10, 0.05 или 0)
      */
     function calculateBonusByProfit(index, total, seller) {
+        const { profit } = seller;
         if (index === 0) return 0.15;           // 1-е место — 15%
         if (index === 1 || index === 2) return 0.10; // 2-е и 3-е места — 10%
         if (index === total - 1) return 0;       // Последнее место — 0%
-        return 0.05;                             // Остальные — 5%
+        return profit * 0.05;                             // Остальные — 5%
     }
 
     // Рассчитываем бонусы и формируем топ-10 товаров для каждого продавца
