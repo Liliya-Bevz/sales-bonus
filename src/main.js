@@ -4,11 +4,16 @@ function calculateSimpleRevenue(purchase, _product) {
     return sale_price * quantity * discountFactor;
 }
 
-function calculateBonusByProfit(index, total) {
-    if (index === 0) return 0.15;           // 1-е место — 15%
-    if (index === 1 || index === 2) return 0.10; // 2-е и 3-е места — 10%
-    if (index === total - 1) return 0;       // Последнее место — 0%
-    return 0.05;                             // Остальные — 5%
+function calculateBonusByProfit(index, total, seller) {
+    const { profit } = seller;
+    let rate;
+
+    if (index === 0) rate = 0.15;           // 1-е место — 15%
+    else if (index === 1 || index === 2) rate = 0.10; // 2-е и 3-е места — 10%
+    else if (index === total - 1) rate = 0;  // Последнее место — 0%
+    else rate = 0.05;                       // Остальные — 5%
+
+    return profit * rate; // Возвращаем сразу сумму бонуса
 }
 
 function analyzeSalesData(data, options) {
@@ -111,17 +116,22 @@ function analyzeSalesData(data, options) {
      * @param {number} total - общее число продавцов
      * @returns {number} - коэффициент бонуса (0.15, 0.10, 0.05 или 0)
      */
-    function calculateBonusByProfit(index, total) {
-        if (index === 0) return 0.15;           // 1-е место — 15%
-        if (index === 1 || index === 2) return 0.10; // 2-е и 3-е места — 10%
-        if (index === total - 1) return 0;       // Последнее место — 0%
-        return 0.05;                             // Остальные — 5%
+    function calculateBonusByProfit(index, total, seller) {
+        const { profit } = seller;
+        let rate;
+
+        if (index === 0) rate = 0.15;           // 1-е место — 15%
+        else if (index === 1 || index === 2) rate = 0.10; // 2-е и 3-е места — 10%
+        else if (index === total - 1) rate = 0;  // Последнее место — 0%
+        else rate = 0.05;                       // Остальные — 5%
+
+        return profit * rate; // Возвращаем сразу сумму бонуса
     }
 
     // Рассчитываем бонусы и формируем топ-10 товаров для каждого продавца
     sortedSellers.forEach((seller, index) => {
-        seller.bonusRate = calculateBonusByProfit(index, sortedSellers.length);
-        seller.bonusAmount = seller.profit * seller.bonusRate;
+        seller.bonusAmount = calculateBonusByProfit(index, sortedSellers.length, seller);
+        seller.bonusRate = seller.bonusAmount / seller.profit;
 
         seller.top_products = Object.entries(seller.products_sold)
             .map(([sku, quantity]) => ({ sku, quantity }))
